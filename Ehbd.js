@@ -18,21 +18,21 @@ class engine {
         
         this.form = document.createElement('form');
 
-        this.rowInput = document.createElement('input');
-        this.rowInput.type = 'number';
-        this.rowInput.id = 'row-input';
-        this.rowInput.name = 'row';
-        this.rowInput.min = 1;
-        this.rowInput.max = this.rows;
-        this.form.appendChild(this.rowInput);
+        // this.rowInput = document.createElement('input');
+        // this.rowInput.type = 'number';
+        // this.rowInput.id = 'row-input';
+        // this.rowInput.name = 'row';
+        // this.rowInput.min = 1;
+        // this.rowInput.max = this.rows;
+        // this.form.appendChild(this.rowInput);
 
-        this.colInput = document.createElement('input');
-        this.colInput.type = 'text';
-        this.colInput.id = 'col-input';
-        this.colInput.name = 'col';
-        this.colInput.min = 1;
-        this.colInput.max = this.cols;
-        this.form.appendChild(this.colInput);
+        this.input = document.createElement('input');
+        this.input.type = 'text';
+        this.input.id = 'col-input';
+        this.input.name = 'col';
+        this.input.min = 1;
+        this.input.max = this.cols;
+        this.form.appendChild(this.input);
 
         this.submitButton = document.createElement('button');
         this.submitButton.type = 'submit';
@@ -50,6 +50,9 @@ class engine {
 class TTT extends engine {
     constructor() {
       super(3, 3);        //inheritance
+      var textElement = document.createElement('p');
+      textElement.textContent = 'Enter the cell number:';
+      this.form.insertBefore(textElement, this.input);
       this.board.style.gap = '100px';
       for (let i = 0; i < this.rows; i++) {
         for (let j = 0; j < this.cols; j++) {
@@ -65,13 +68,9 @@ class TTT extends engine {
       this.col = null;
       this.form.addEventListener('submit', (event) => {
           event.preventDefault();
-          this.row = parseInt(this.rowInput.value) - 1;
-          this.col = this.colInput.value.charCodeAt(0)- 97;
-          try {
-            this.controller();
-          } catch (error) {
-            console.error(error.message);
-          }
+          this.row = this.input.value.charCodeAt(0) - 49;
+          this.col = this.input.value.charCodeAt(1)- 97;
+          this.controller();
         });
     
       document.body.appendChild(this.board);
@@ -106,6 +105,9 @@ class TTT extends engine {
 class Connect4 extends engine {
   constructor() {
     super(6, 7);
+    var textElement = document.createElement('p');
+    textElement.textContent = 'Enter the column number:';
+    this.form.insertBefore(textElement, this.input);
     this.board.style.backgroundColor = 'blue';
     this.board.style.border = '10px solid navy';
     this.board.style.width = '610px';
@@ -127,12 +129,81 @@ class Connect4 extends engine {
         this.board.appendChild(cell);
       }
     }
-    this.rowInput.style.visibility = 'hidden';
- 
     this.col = null;
     this.form.addEventListener('submit', (event) => {
         event.preventDefault();
-        this.col = this.colInput.value.charCodeAt(0)- 97;
+        this.col = this.input.value.charCodeAt(0)- 97;
+        console.log(this.col);
+        this.controller();
+      });
+    document.body.appendChild(this.board);
+    document.body.appendChild(this.form);
+  }
+  drawer(){
+      const cells = document.querySelectorAll('.cell');
+      for (let i = 0; i < cells.length; i++) {
+        const row = cells[i].dataset.row;
+        const col = cells[i].dataset.col;
+        //cells[i].textContent = this.grid[row][col];
+        if(this.grid[row][col] == '1'){
+          cells[i].style.backgroundColor = 'red';
+          console.log(this.turn);
+        }else if( this.grid[row][col] == '2'){
+          cells[i].style.backgroundColor = 'yellow';
+          console.log(this.turn);
+        }
+      }
+  }
+  controller() {
+    let flag = 0;
+    if(this.col > 6 || this.col < 0){
+      alert('Invalid place');
+      return;
+    }
+    for(let i=5; i>= 0; i--){
+      if(this.grid[i][this.col] != '1' && this.grid[i][this.col] != '2'){
+        flag = 1;
+        if(this.turn == 1){
+          this.grid[i][this.col] = '1';
+          this.turn = 2;
+        }else{
+          this.grid[i][this.col] = '2';
+          this.turn = 1;
+        }
+        break;
+      }
+    }
+    if(flag === 1){
+      this.drawer();
+    }else{
+      alert('Invalid place');
+    }
+  }
+}
+
+//chess
+class Chess extends engine {
+  constructor() {
+    super(8, 8);        //inheritance
+    this.board.style.gap = '50px';
+    this.toInput = document.createElement('input');
+    this.toInput.type = 'text';
+    this.toInput.id = 'col-input';
+    this.toInput.name = 'col1';
+    this.toInput.min = 1;
+    this.toInput.max = this.cols;
+    this.form.appendChild(this.toInput);
+    this.init();
+    this.frow = null;
+    this.fcol = null;
+    this.trow = null;
+    this.tcol = null;
+    this.form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        this.frow = this.input.value.charCodeAt(0)- 49;
+        this.fcol = this.input.value.charCodeAt(1)- 97;
+        this.trow = this.toInput.value.charCodeAt(0)- 49;
+        this.tcol = this.toInput.value.charCodeAt(1)- 97;
         try {
           this.controller();
         } catch (error) {
@@ -143,47 +214,103 @@ class Connect4 extends engine {
     document.body.appendChild(this.board);
     document.body.appendChild(this.form);
   }
-  drawer(){
-      const cells = document.querySelectorAll('.cell');
-      for (let i = 0; i < cells.length; i++) {
-        const row = cells[i].dataset.row;
-        const col = cells[i].dataset.col;
-        cells[i].textContent = this.grid[row][col];
-        if(this.grid[row][col] == '1'){
-          cells[i].style.backgroundColor = 'red';
-          console.log(this.turn);
-        }else if( this.grid[row][col] == '2'){
-          cells[i].style.backgroundColor = 'yellow';
-          console.log(this.turn);
-        }
-      }
-      for(let i=0; i<6; i++){
-        for(let j=0; j<7; j++){
-          console.log(this.grid[i][j]);
-        }
-      }
-      this.turn = this.turn%2;
-      this.turn++;
-      
-  }
+  // drawer(){
+  //     const cells = document.querySelectorAll('.cell');
+  //     for (let i = 0; i < cells.length; i++) {
+  //       const row = cells[i].dataset.row;
+  //       const col = cells[i].dataset.col;
+  //       cells[i].textContent = this.grid[row][col];
+  //     }
+  // }
   controller() {
-    let flag = 0;
-    for(let i=5; i>= 0; i--){
-      if(this.grid[i][this.col] != '1' && this.grid[i][this.col] != '2'){
-        flag = 1;
-        if(this.turn == 1){
-          this.grid[i][this.col] = '1';
+    if (this.grid[this.frow][this.fcol] == ' ') {
+      alert('Invalid place');
+    }else{
+      if(this.turn == 1){ //white turn
+        if(this.grid[this.frow][this.fcol] < 1912 || this.grid[this.frow][this.fcol] > 1917 ||
+           this.trow < 0 || this.trow > 7 || this.tcol < 0 || this.tcol > 7){
+          console.log("error");
+          return;
         }else{
-          this.grid[i][this.col] = '2';
+
         }
-        break;
+        this.turn = 2;
+      }else{ //black turn
+
+        this.turn = 1;
       }
     }
-    
-    if(flag === 1){
+    /*else {
+      if (this.turn == 1) {
+        this.grid[this.row][this.col] = 'X';
+        this.turn = 2;
+      } else if (this.turn == 2) {
+        this.grid[this.row][this.col] = 'O';
+        this.turn = 1;
+      }
       this.drawer();
-    }else{
-      alert('Invalid place');
+    }*/
+  }
+  init(){
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.row = i;
+        cell.dataset.col = j;
+        cell.style.width = '62px';
+        cell.style.height = '62px';
+        //black
+        if(i == 1){
+          cell.textContent = String.fromCharCode(9823);
+          this.grid[i][j] = 9823;
+        }
+        if(i == 0 ){
+          if(j == 0 || j ==7) //Rooks
+            cell.textContent = String.fromCharCode(9820);
+            this.grid[i][j] = 9820;
+          if(j == 1 || j==6)  //Knights
+            cell.textContent = String.fromCharCode(9822);
+            this.grid[i][j] = 9822;
+          if(j == 2 || j==5)  //Bishops
+            cell.textContent = String.fromCharCode(9821);
+            this.grid[i][j] = 9821;
+          if(j == 3)  //Queen
+            cell.textContent = String.fromCharCode(9819);
+            this.grid[i][j] = 9819;
+          if(j == 4)  //King
+            cell.textContent = String.fromCharCode(9818);
+            this.grid[i][j] = 9818;
+        }
+        //white
+        if(i == 6){
+          cell.textContent = String.fromCharCode(9817);
+          this.grid[i][j] = 9817;
+        }
+        if(i == 7 ){
+          if(j == 0 || j ==7) //Rooks
+            cell.textContent = String.fromCharCode(9814);
+            this.grid[i][j] = 9814;
+          if(j == 1 || j==6)  //Knights
+            cell.textContent = String.fromCharCode(9816);
+            this.grid[i][j] = 9816;
+          if(j == 2 || j==5)  //Bishops
+            cell.textContent = String.fromCharCode(9815);
+            this.grid[i][j] = 9815;
+          if(j == 3)  //Queen
+            cell.textContent = String.fromCharCode(9813);
+            this.grid[i][j] = 9813;
+          if(j == 4)  //King
+            cell.textContent = String.fromCharCode(9812);
+            this.grid[i][j] = 9812;
+        }
+        if((i+j)%2 == 0){
+          cell.style.backgroundColor = 'grey';
+        }else{
+          cell.style.backgroundColor = 'white';
+        }
+        this.board.appendChild(cell);
+      }
     }
   }
 }
@@ -198,7 +325,7 @@ games.forEach(game => {
       if(text === 'Tic-Tac-Toe'){
         game = new TTT();
       }else if(text === 'Chess'){
-        console.log(231);
+        game = new Chess();
       }else if(text === 'Checkers'){
         console.log(321);
       }else if(text === 'Connect4'){
