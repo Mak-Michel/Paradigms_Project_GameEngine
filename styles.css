@@ -62,3 +62,11 @@ h1 {
 .cell:hover {
   background-color: #eee;
 }
+
+.button{
+    position: relative;
+    top: 50px;
+    right: 170px;
+    width: 100px;
+    height: 40px;
+}

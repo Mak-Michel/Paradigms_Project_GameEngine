@@ -7,7 +7,7 @@ class engine {
             this.grid[i] = new Array(cols);
             for (let j = 0; j < rows; j++) {
               this.grid[i][j] = ' ';
-          }
+            }
         }
         this.turn = 1;
 
@@ -17,14 +17,6 @@ class engine {
         this.board.style.gridTemplateRows = `repeat(${this.rows}, 10px)`;
         
         this.form = document.createElement('form');
-
-        // this.rowInput = document.createElement('input');
-        // this.rowInput.type = 'number';
-        // this.rowInput.id = 'row-input';
-        // this.rowInput.name = 'row';
-        // this.rowInput.min = 1;
-        // this.rowInput.max = this.rows;
-        // this.form.appendChild(this.rowInput);
 
         this.input = document.createElement('input');
         this.input.type = 'text';
@@ -36,6 +28,7 @@ class engine {
 
         this.submitButton = document.createElement('button');
         this.submitButton.type = 'submit';
+        this.submitButton.classList.add('button');
         this.submitButton.textContent = 'Play';
         this.form.appendChild(this.submitButton);
     }
@@ -185,6 +178,10 @@ class Connect4 extends engine {
 class Chess extends engine {
   constructor() {
     super(8, 8);        //inheritance
+    var textElement = document.createElement('p');
+    textElement.innerHTML = 'Initial position: &#9;&#9;&#9;Final Position:';
+    textElement.style.whiteSpace = 'pre'; // Preserve whitespace characters
+    this.form.insertBefore(textElement, this.input);
     this.board.style.gap = '50px';
     this.toInput = document.createElement('input');
     this.toInput.type = 'text';
@@ -193,6 +190,9 @@ class Chess extends engine {
     this.toInput.min = 1;
     this.toInput.max = this.cols;
     this.form.appendChild(this.toInput);
+    this.toInput.style.position = 'relative';
+    this.toInput.style.right = '60px'
+    
     this.init();
     this.frow = null;
     this.fcol = null;
@@ -223,15 +223,14 @@ class Chess extends engine {
     }
   }
   controller() {
-    let clearPath = false;
+    let clearPath = false, piece = 0;
     if (this.grid[this.frow][this.fcol] == ' ') {
       alert('Invalid place1');
     }else{
       if(this.turn == 1){ //white turn
         if(this.grid[this.trow][this.tcol] == 9813 || this.grid[this.trow][this.tcol] == 9814 ||
           this.grid[this.trow][this.tcol] == 9815 || this.grid[this.trow][this.tcol] == 9816 ||
-          this.grid[this.trow][this.tcol] == 9816 || this.grid[this.trow][this.tcol] == 9817 || 
-          this.grid[this.trow][this.tcol] == 9812){
+          this.grid[this.trow][this.tcol] == 9817 || this.grid[this.trow][this.tcol] == 9812){
            alert('Invalid move');
            return;
          }
@@ -240,37 +239,27 @@ class Chess extends engine {
             alert('Invalid place2');
             return;
         }else{
-          var flag = 0;
           switch(this.grid[this.frow][this.fcol]){
               case 9817: //pawn
                 if(this.trow == this.frow-1){
                   if(this.fcol == this.tcol){
                     if(this.grid[this.trow][this.tcol] == ' '){
-                      flag = 1;
-                    }else{
-                      alert('Invalid place3');
-                      return;
+                      clearPath = true;
                     }
                   }else if((this.fcol - this.tcol) == 1 && this.grid[this.trow][this.tcol] != ' '){
-                      flag = 1;
+                      clearPath = true;
                   }else if((this.tcol - this.fcol) == 1 && this.grid[this.trow][this.tcol] != ' '){
-                      flag = 1;
+                      clearPath = true;
                   }
                 }else if(this.trow == this.frow-2 && this.fcol == this.tcol){
                   if(this.grid[this.trow][this.tcol] == ' ' && this.grid[this.frow-1][this.fcol] == ' '){
                     if(this.frow == 6){
-                      flag = 1;
-                    }else{
-                      alert('Invalid place3');
-                      return;
+                      clearPath = true;
                     }
                   }
-                }else{
-                  alert('invalid move');
                 }
-                if(flag == 1){
-                  this.grid[this.trow][this.tcol] = 9817;
-                  this.grid[this.frow][this.fcol] = ' ';
+                if(clearPath){
+                  piece = 9817;
                 }
                 break;
               case 9812: //King
@@ -279,8 +268,8 @@ class Chess extends engine {
                   alert('Invalid move');
                   return;
                 } else {
-                  this.grid[this.trow][this.tcol] = 9812;
-                  this.grid[this.frow][this.fcol] = ' ';
+                  clearPath = true;
+                  piece = 9812;
                 }
                 break;
               case 9813: //Queen
@@ -289,55 +278,122 @@ class Chess extends engine {
                 }else if(Math.abs(this.trow - this.frow) === Math.abs(this.tcol - this.fcol)){
                   clearPath = this.validateMoveDiagonally();
                 }
-                if (clearPath) {
-                  this.grid[this.trow][this.tcol] = 9813;
-                  this.grid[this.frow][this.fcol] = ' ';
-                } else {
-                  alert('Invalid move');
-                  return;
-                }
+                piece = 9813;
               break;
               case 9814: //ٌRooks
                 clearPath = this.validateMove();
-                  if (clearPath) {
-                    this.grid[this.trow][this.tcol] = 9814;
-                    this.grid[this.frow][this.fcol] = ' ';
-                  } else {
-                    alert('Invalid move');
-                    return;
-                  }
+                piece = 9814;
               break;
               case 9815: //bishops
-                clearPath = this.validateMoveDiagonally();
-                if (clearPath) {
-                  this.grid[this.trow][this.tcol] = 9815;
-                  this.grid[this.frow][this.fcol] = ' ';
-                } else {
-                  alert('Invalid move');
-                  return;
+                if(Math.abs(this.trow - this.frow) === Math.abs(this.tcol - this.fcol)){
+                  clearPath = this.validateMoveDiagonally();
                 }
+                piece = 9815;
+                console.log(238794);
               break;
               case 9816: //Knights
-              if((Math.abs(this.tcol - this.fcol) == 1 && Math.abs(this.trow - this.frow) == 2) ||
-                  (Math.abs(this.trow - this.frow) == 1 && Math.abs(this.tcol - this.fcol) == 2) ){
-                    clearPath = true;
-              }
-                if (clearPath) {
-                  this.grid[this.trow][this.tcol] = 9816;
-                  this.grid[this.frow][this.fcol] = ' ';
-                } else {
-                  alert('Invalid move');
-                  return;
+                if((Math.abs(this.tcol - this.fcol) == 1 && Math.abs(this.trow - this.frow) == 2) ||
+                    (Math.abs(this.trow - this.frow) == 1 && Math.abs(this.tcol - this.fcol) == 2) ){
+                      clearPath = true;
                 }
+                piece = 9816;
+              break;
+            }
+            if (clearPath) {
+              this.grid[this.trow][this.tcol] = piece;
+              this.grid[this.frow][this.fcol] = ' ';
+              this.turn = 2;
+            } else {
+              alert('Invalid move');
+              return;
             }
           }
+          this.drawer();
+        }else{ //black turn
+          if(this.grid[this.trow][this.tcol] == 9818 || this.grid[this.trow][this.tcol] == 9819 ||
+            this.grid[this.trow][this.tcol] == 9820 || this.grid[this.trow][this.tcol] == 9821 ||
+            this.grid[this.trow][this.tcol] == 9822 || this.grid[this.trow][this.tcol] == 9823){
+             alert('Invalid move');
+             return;
+           }
+          if(this.grid[this.frow][this.fcol] < 9818 || this.grid[this.frow][this.fcol] > 9823 ||
+             this.trow < 0 || this.trow > 7 || this.tcol < 0 || this.tcol > 7){
+              alert('Invalid place2');
+              return;
+          }else{
+            switch(this.grid[this.frow][this.fcol]){
+                case 9823: //pawn
+                  if(this.trow == this.frow+1){
+                    if(this.fcol == this.tcol){
+                      if(this.grid[this.trow][this.tcol] == ' '){
+                        clearPath = true;
+                      }
+                    }else if((this.fcol - this.tcol) == 1 && this.grid[this.trow][this.tcol] != ' '){
+                        clearPath = true;
+                    }else if((this.tcol - this.fcol) == 1 && this.grid[this.trow][this.tcol] != ' '){
+                        clearPath = true;
+                    }
+                  }else if(this.trow == this.frow+2 && this.fcol == this.tcol){
+                    if(this.grid[this.trow][this.tcol] == ' ' && this.grid[this.frow+1][this.fcol] == ' '){
+                      if(this.frow == 1){
+                        clearPath = true;
+                      }
+                    }
+                  }
+                  if(clearPath){
+                    piece = 9823;
+                  }
+                  break;
+                case 9818: //King
+                  if ((Math.abs(this.trow - this.frow) > 1) || (Math.abs(this.tcol - this.fcol) > 1) ||
+                      (this.trow- this.frow == 0 && this.tcol- this.fcol == 0)) {
+                    alert('Invalid move');
+                    return;
+                  } else {
+                    clearPath = true;
+                    piece = 9818;
+                  }
+                  break;
+                case 9819: //Queen
+                  if(this.trow - this.frow == 0 || this.tcol-this.fcol == 0){
+                    clearPath = this.validateMove();
+                  }else if(Math.abs(this.trow - this.frow) === Math.abs(this.tcol - this.fcol)){
+                    clearPath = this.validateMoveDiagonally();
+                  }
+                  piece = 9819;
+                break;
+                case 9820: //ٌRooks
+                  clearPath = this.validateMove();
+                  piece = 9820;
+                break;
+                case 9821: //bishops
+                  if(Math.abs(this.trow - this.frow) === Math.abs(this.tcol - this.fcol)){
+                    clearPath = this.validateMoveDiagonally();
+                  }
+                  piece = 9821;
+                  console.log(238794);
+                break;
+                case 9822: //Knights
+                  if((Math.abs(this.tcol - this.fcol) == 1 && Math.abs(this.trow - this.frow) == 2) ||
+                      (Math.abs(this.trow - this.frow) == 1 && Math.abs(this.tcol - this.fcol) == 2) ){
+                        clearPath = true;
+                  }
+                  piece = 9822;
+                break;
+              }
+              if (clearPath) {
+                this.grid[this.trow][this.tcol] = piece;
+                this.grid[this.frow][this.fcol] = ' ';
+                this.turn = 1;
+              } else {
+                alert('Invalid move');
+                return;
+              }
+            }
+            this.drawer();
         }
-        this.drawer();
-        //this.turn = 2;
-      }/*else{ //black turn
-
-        this.turn = 1;
-      }*/
+        
+      }
     }
 
   init(){
@@ -350,7 +406,7 @@ class Chess extends engine {
         cell.style.width = '62px';
         cell.style.height = '62px';
         //black
-        if(i == 1){
+        if(i == 1){//pawn
           cell.textContent = String.fromCharCode(9823);
           this.grid[i][j] = 9823;
         }
@@ -451,37 +507,37 @@ class Chess extends engine {
    return clearPath;
   }
   validateMoveDiagonally(){
-    let clearPath = true;
+    let boo = true;
       if(this.trow > this.frow && this.tcol > this.fcol){  //move down right
         for(let i= this.frow+1, j = this.fcol+1; i<this.trow; i++, j++){
           if (this.grid[i][j] !== ' ') {
-            clearPath = false;
+            boo = false;
             break;
           }
         }
       }else if(this.trow > this.frow && this.tcol < this.fcol){ //move down left
-        for(let i= this.frow+1, j = this.fcol+1; i<this.trow; i++, j--){
+        for(let i= this.frow+1, j = this.fcol-1; i<this.trow; i++, j--){
           if (this.grid[i][j] !== ' ') {
-            clearPath = false;
+            boo = false;
             break;
           }
         }
       }else if(this.trow < this.frow && this.tcol > this.fcol){ //move up right
-        for(let i= this.frow+1, j = this.fcol+1; j<this.tcol; i--, j++){
+        for(let i= this.frow-1, j = this.fcol+1; j<this.tcol; i--, j++){
           if (this.grid[i][j] !== ' ') {
-            clearPath = false;
+            boo = false;
             break;
           }
         }
       }else{
-        for(let i= this.trow+1, j = this.tcol+1; j<this.tcol; i--, j--){
+        for(let i= this.trow+1, j = this.tcol+1; j<this.fcol; i++, j++){//move up left
           if (this.grid[i][j] !== ' ') {
-            clearPath = false;
+            boo = false;
             break;
           }
         }
       }
-      return clearPath;
+      return boo;
   }
 }
 
