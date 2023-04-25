@@ -540,8 +540,98 @@ class Chess extends engine {
       return boo;
   }
 }
-
+//8-Queens
 class EightQueens extends engine {
+  constructor() {
+    super(10, 10);        //inheritance
+    this.board.style.gap = '50px';
+    this.init();
+    this.row = null;
+    this.col = null;
+    this.form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        this.row = this.input.value.charCodeAt(0)- 48;
+        this.col = this.input.value.charCodeAt(1)- 96;
+        this.controller();
+      });
+    document.body.appendChild(this.board);
+    document.body.appendChild(this.form);
+  }
+  drawer() {
+    const cells = document.querySelectorAll('.cell');
+    let index = 11;
+    for (let i = 1; i < 9; i++) {
+      for (let j = 1; j < 9; j++) {
+        if (this.grid[i][j] == ' ') {
+          cells[index].textContent = this.grid[i][j];
+        } else {
+          cells[index].textContent = String.fromCharCode(this.grid[i][j]);
+        }
+        index++;
+      }
+      index+=2;
+    }
+  }
+  controller() {
+    if(this.row < 0 || this.row>8 || this.col < 0|| this.col > 8){
+      alert("Invalid place");
+    }else{
+      if(this.grid[this.row][this.col] == 9813){
+        this.grid[this.row][this.col] = ' ';
+        this.drawer();
+        return;
+      }
+      for(let i =0; i<10;i++){
+        for(let j=0; j<10; j++){
+          if(this.grid[i][j] == 9813){
+            if(Math.abs(i-this.row) === Math.abs(j-this.col) || Math.abs(j-this.col) == 0 || Math.abs(i-this.row) == 0){
+              alert("Invalid place2");
+              return;
+            }
+          }
+        }
+      }
+      this.grid[this.row][this.col] = 9813;
+      this.drawer();
+    }
+  }
+  init(){
+    var rowNumbers = [1,2,3,4,5,6,7,8];
+    var colLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.style.width = '62px';
+        cell.style.height = '62px';
+        if(i == 0 || i == 9){
+          if(j > 0){
+            cell.textContent = colLetters[j-1];
+          }
+          cell.style.backgroundColor = 'brown';
+          cell.style.border = '0px'
+        }else{
+          if(j == 0 || j== 9){
+            if(i > 0){
+              cell.textContent = rowNumbers[i-1];
+            }
+            cell.style.backgroundColor = 'brown';
+            cell.style.border = '0px'
+          }else{
+            if((i+j)%2 == 0){
+              cell.style.backgroundColor = 'grey';
+            }else{
+              cell.style.backgroundColor = 'white';
+            }
+          }
+        }
+        this.board.appendChild(cell);
+      }
+    }
+  }
+}
+//Checkers
+class Checkers extends engine {
   constructor() {
     super(10, 10);        //inheritance
     this.board.style.gap = '50px';
@@ -619,7 +709,6 @@ class EightQueens extends engine {
     }
   }
 }
-
 //////////////////////////////////////////////////////////////////
 let game;
 const games = document.querySelectorAll('.game');
@@ -633,7 +722,7 @@ games.forEach(game => {
       }else if(text === 'Chess'){
         game = new Chess();
       }else if(text === 'Checkers'){
-        console.log(321);
+        game = new Checkers();
       }else if(text === 'Connect4'){
         game = new Connect4();
       }else if(text === 'Sudoku'){

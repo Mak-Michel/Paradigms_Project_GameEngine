@@ -1,8 +1,19 @@
 body {
+    background: #000000; /* Set a fallback background color */
     background-color: #f2f2f2;
     font-family: Arial, sans-serif;
+} 
+video {
+    position: fixed;
+    top: 25%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: -1;
 }
-
 h1 {
     text-align: center;
     margin-top: 20px;
