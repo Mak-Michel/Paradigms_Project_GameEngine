@@ -543,7 +543,7 @@ class Chess extends engine {
 
 class EightQueens extends engine {
   constructor() {
-    super(9, 9);        //inheritance
+    super(10, 10);        //inheritance
     this.board.style.gap = '50px';
     this.init();
     this.row = null;
@@ -559,9 +559,8 @@ class EightQueens extends engine {
   }
   drawer() {
     const cells = document.querySelectorAll('.cell');
-    let index = 9;
+    let index = 11;
     for (let i = 1; i < 9; i++) {
-      index++;
       for (let j = 1; j < 9; j++) {
         if (this.grid[i][j] == ' ') {
           cells[index].textContent = this.grid[i][j];
@@ -570,7 +569,7 @@ class EightQueens extends engine {
         }
         index++;
       }
-      
+      index+=2;
     }
   }
   controller() {
@@ -594,14 +593,14 @@ class EightQueens extends engine {
         cell.classList.add('cell');
         cell.style.width = '62px';
         cell.style.height = '62px';
-        if(i == 0){
+        if(i == 0 || i == 9){
           if(j > 0){
             cell.textContent = colLetters[j-1];
           }
           cell.style.backgroundColor = 'brown';
           cell.style.border = '0px'
         }else{
-          if(j == 0 ){
+          if(j == 0 || j== 9){
             if(i > 0){
               cell.textContent = rowNumbers[i-1];
             }
