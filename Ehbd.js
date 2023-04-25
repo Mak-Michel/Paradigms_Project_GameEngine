@@ -541,6 +541,66 @@ class Chess extends engine {
   }
 }
 
+class EightQueens extends engine {
+  constructor() {
+    super(8, 8);        //inheritance
+    this.board.style.gap = '50px';
+    this.init();
+    this.row = null;
+    this.col = null;
+    this.form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        this.row = this.input.value.charCodeAt(0)- 49;
+        this.col = this.input.value.charCodeAt(1)- 97;
+        this.controller();
+      });
+    document.body.appendChild(this.board);
+    document.body.appendChild(this.form);
+  }
+  drawer() {
+    const cells = document.querySelectorAll('.cell');
+    for (let i = 0; i < cells.length; i++) {
+      const row = parseInt(cells[i].dataset.row);
+      const col = parseInt(cells[i].dataset.col);
+      if (this.grid[row][col] == ' ') {
+        cells[i].textContent = this.grid[row][col];
+      } else {
+        cells[i].textContent = String.fromCharCode(this.grid[row][col]);
+      }
+    }
+  }
+  controller() {
+    if(this.row < 0 || this.row>7 || this.col < 0|| this.col > 7){
+      alert("Invalid place");
+    }else{
+      if(this.grid[this.row][this.col] == 9813){
+        this.grid[this.row][this.col] = ' ';
+      }else{
+        this.grid[this.row][this.col] = 9813;
+      }
+      this.drawer();
+    }
+  }
+  init(){
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.row = i;
+        cell.dataset.col = j;
+        cell.style.width = '62px';
+        cell.style.height = '62px';
+        if((i+j)%2 == 0){
+          cell.style.backgroundColor = 'grey';
+        }else{
+          cell.style.backgroundColor = 'white';
+        }
+        this.board.appendChild(cell);
+      }
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////
 let game;
 const games = document.querySelectorAll('.game');
@@ -560,7 +620,7 @@ games.forEach(game => {
       }else if(text === 'Sudoku'){
         console.log(546);
       }else if(text === '8-Queens'){
-        console.log(654);
+        game = new EightQueens();
       }
       document.querySelectorAll('.game').forEach(e => e.remove());
       var title = document.querySelector(".title");
