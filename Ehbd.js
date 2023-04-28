@@ -633,80 +633,264 @@ class EightQueens extends engine {
 //Checkers
 class Checkers extends engine {
   constructor() {
-    super(10, 10);        //inheritance
+    super(8, 8);        //inheritance
+    var textElement = document.createElement('p');
+    textElement.innerHTML = 'Initial position: &#9;&#9;&#9;Final Position:';
+    textElement.style.whiteSpace = 'pre'; // Preserve whitespace characters
+    this.form.insertBefore(textElement, this.input);
     this.board.style.gap = '50px';
+    this.toInput = document.createElement('input');
+    this.toInput.type = 'text';
+    this.toInput.id = 'col-input';
+    this.toInput.name = 'col1';
+    this.toInput.min = 1;
+    this.toInput.max = this.cols;
+    this.form.appendChild(this.toInput);
+    this.toInput.style.position = 'relative';
+    this.toInput.style.right = '60px'
+    
     this.init();
-    this.row = null;
-    this.col = null;
+    this.frow = null;
+    this.fcol = null;
+    this.trow = null;
+    this.tcol = null;
     this.form.addEventListener('submit', (event) => {
         event.preventDefault();
-        this.row = this.input.value.charCodeAt(0)- 48;
-        this.col = this.input.value.charCodeAt(1)- 96;
+        this.frow = this.input.value.charCodeAt(0)- 49;
+        this.fcol = this.input.value.charCodeAt(1)- 97;
+        this.trow = this.toInput.value.charCodeAt(0)- 49;
+        this.tcol = this.toInput.value.charCodeAt(1)- 97;
         this.controller();
       });
+  
     document.body.appendChild(this.board);
     document.body.appendChild(this.form);
   }
   drawer() {
+    const white1 = 'white1.png';
+    const black1 = 'black1.png';
+    const white2 = 'white2.png';
+    const black2 = 'black2.png';
     const cells = document.querySelectorAll('.cell');
-    let index = 11;
-    for (let i = 1; i < 9; i++) {
-      for (let j = 1; j < 9; j++) {
-        if (this.grid[i][j] == ' ') {
-          cells[index].textContent = this.grid[i][j];
-        } else {
-          cells[index].textContent = String.fromCharCode(this.grid[i][j]);
-        }
-        index++;
+    for (let i = 0; i < cells.length; i++) {
+      const row = parseInt(cells[i].dataset.row);
+      const col = parseInt(cells[i].dataset.col);
+      if (this.grid[row][col] == ' ') {
+        cells[i].innerHTML = '';
+      }else if(this.grid[row][col] == 1){ // white piece
+        cells[i].innerHTML = `<img src="${white1}" alt="My Image" style="width: 100%; height: 100%;">`;
+      }else if(this.grid[row][col] == 2){ // black piece
+        cells[i].innerHTML = `<img src="${black1}" alt="My Image" style="width: 100%; height: 100%;">`;
+      }else if(this.grid[row][col] == 3){ // king white
+        cells[i].innerHTML = `<img src="${white2}" alt="My Image" style="width: 100%; height: 100%;">`;
+      }else if(this.grid[row][col] == 4){ // king black
+        cells[i].innerHTML = `<img src="${black2}" alt="My Image" style="width: 100%; height: 100%;">`;
       }
-      index+=2;
     }
   }
   controller() {
-    if(this.row < 0 || this.row>8 || this.col < 0|| this.col > 8){
-      alert("Invalid place");
+    let play = false, piece, count= 0;
+    if (this.grid[this.frow][this.fcol] == ' ') {
+      alert('Invalid place1');
+    }else if(this.grid[this.trow][this.tcol] != ' '){
+      alert("Invalid move");
+      return;
+    }else if(this.grid[this.frow][this.fcol] < 1 || this.grid[this.frow][this.fcol] > 4 ||
+      this.trow < 0 || this.trow > 7 || this.tcol < 0 || this.tcol > 7){
+       alert('Invalid place2');
+       return;
     }else{
-      if(this.grid[this.row][this.col] == 9813){
-        this.grid[this.row][this.col] = ' ';
-      }else{
-        this.grid[this.row][this.col] = 9813;
+      if(this.turn == 1){ //white turn
+        if(this.grid[this.frow][this.fcol] == 1){
+          if(this.trow == this.frow -1 && (this.tcol == this.fcol+1 || this.tcol == this.fcol-1)){
+            play = true;
+            piece = 1;
+          }else if(this.trow == this.frow -2 && this.tcol == this.fcol+2){
+            if(this.grid[this.frow-1][this.fcol+1] == 2 || this.grid[this.frow-1][this.fcol+1] == 4){
+              play = true;
+              piece = 1;
+              this.grid[this.frow-1][this.fcol+1] = ' ';
+            }
+          }else if(this.trow == this.frow -2 && this.tcol == this.fcol-2){
+            if(this.grid[this.frow-1][this.fcol-1] == 2 || this.grid[this.frow-1][this.fcol-1] == 4){
+              play = true;
+              piece = 1;
+              this.grid[this.frow-1][this.fcol-1] = ' ';
+            }
+          }else if(this.trow == this.frow +2 && this.tcol == this.fcol+2){
+            if(this.grid[this.frow+1][this.fcol+1] == 2 || this.grid[this.frow+1][this.fcol+1] == 4){
+              play = true;
+              piece =1
+              this.grid[this.frow+1][this.fcol+1] = ' ';
+            }
+          }else if(this.trow == this.frow +2 && this.tcol == this.fcol-2){
+            if(this.grid[this.frow+1][this.fcol-1] == 2 || this.grid[this.frow+1][this.fcol-1] == 4){
+              play = true;
+              piece =1
+              this.grid[this.frow+1][this.fcol-1] = ' ';
+            }
+          }
+        }else if(this.grid[this.frow][this.fcol] == 3){
+          let piece2 = this.validateMoveDiagonally();
+          if(this.count == 0){
+            play = true;
+            piece = 3;
+          }else if(this.count == 1){
+            this.grid[piece2[0]][piece2[1]] = ' ';
+            play = true;
+            piece = 3;
+          }else{
+            alert(412345);
+            return;
+          }
+        }
+        if(play){
+          this.grid[this.trow][this.tcol] = piece;
+          this.grid[this.frow][this.fcol] = ' ';
+          if(this.trow == 0){
+            this.grid[this.trow][this.tcol] = 3;
+          }
+          this.turn = 2;
+          this.drawer();
+        }else{
+          alert(41234);
+          return;
+        }
+      }else{// black turn
+        if(this.grid[this.frow][this.fcol] == 2){
+          if(this.trow == this.frow +1 && (this.tcol == this.fcol+1 || this.tcol == this.fcol-1)){
+            play = true;
+            piece = 2;
+          }else if(this.trow == this.frow -2 && this.tcol == this.fcol+2){
+            if(this.grid[this.frow-1][this.fcol+1] == 1 || this.grid[this.frow-1][this.fcol+1] == 3){
+              play = true;
+              piece = 2;
+              this.grid[this.frow-1][this.fcol+1] = ' ';
+            }
+          }else if(this.trow == this.frow -2 && this.tcol == this.fcol-2){
+            if(this.grid[this.frow-1][this.fcol-1] == 1 || this.grid[this.frow-1][this.fcol-1] == 3){
+              play = true;
+              piece = 2;
+              this.grid[this.frow-1][this.fcol-1] = ' ';
+            }
+          }else if(this.trow == this.frow +2 && this.tcol == this.fcol+2){
+            if(this.grid[this.frow+1][this.fcol+1] == 1 || this.grid[this.frow+1][this.fcol+1] == 3){
+              play = true;
+              piece =2;
+              this.grid[this.frow+1][this.fcol+1] = ' ';
+            }
+          }else if(this.trow == this.frow +2 && this.tcol == this.fcol-2){
+            if(this.grid[this.frow+1][this.fcol-1] == 1 || this.grid[this.frow+1][this.fcol-1] == 3){
+              play = true;
+              piece =2;
+              this.grid[this.frow+1][this.fcol-1] = ' ';
+            }
+          }
+        }else if(this.grid[this.frow][this.fcol] == 4){
+          let piece2 = this.validateMoveDiagonally();
+          if(this.count == 0){
+            play = true;
+            piece = 4;
+          }else if(this.count == 1){
+            this.grid[piece2[0]][piece2[1]] = ' ';
+            play = true;
+            piece = 4;
+          }else{
+            alert(41234);
+            return;
+          }
+        }
+        if(play){
+          this.grid[this.trow][this.tcol] = piece;
+          this.grid[this.frow][this.fcol] = ' ';
+          if(this.trow == 7){
+            this.grid[this.trow][this.tcol] = 4;
+          }
+          this.turn = 1;
+          this.drawer();
+        }else{
+          alert(41234);
+          return;
+        }
       }
-      this.drawer();
     }
   }
   init(){
-    var rowNumbers = [1,2,3,4,5,6,7,8];
-    var colLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const white1 = 'white1.png';
+    const black1 = 'black1.png';
+    const cellSize = '62px';
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         const cell = document.createElement('div');
         cell.classList.add('cell');
-        cell.style.width = '62px';
-        cell.style.height = '62px';
-        if(i == 0 || i == 9){
-          if(j > 0){
-            cell.textContent = colLetters[j-1];
-          }
-          cell.style.backgroundColor = 'brown';
-          cell.style.border = '0px'
+        cell.dataset.row = i;
+        cell.dataset.col = j;
+        cell.style.width = cellSize;
+        cell.style.height = cellSize;
+        //black
+        if((i == 0 || i == 2) && (j%2 == 1)){
+          cell.innerHTML = `<img src="${black1}" alt="My Image" style="width: 100%; height: 100%;">`;
+          this.grid[i][j] = 2;
+        }
+        if(i == 1 && j%2 == 0){
+          cell.innerHTML = `<img src="${black1}" alt="My Image" style="width: 100%; height: 100%;">`;
+          this.grid[i][j] = 2;
+        }
+        //white
+        if((i == 6) && (j%2 == 1)){
+          cell.innerHTML = `<img src="${white1}" alt="My Image" style="width: 100%; height: 100%;">`;
+          this.grid[i][j] = 1;
+        }
+        if((i == 5 || i == 7) && j%2 == 0){
+          cell.innerHTML = `<img src="${white1}" alt="My Image" style="width: 100%; height: 100%;">`;
+          this.grid[i][j] = 1;
+        }
+        if((i+j)%2 == 0){
+          cell.style.backgroundColor = 'grey';
         }else{
-          if(j == 0 || j== 9){
-            if(i > 0){
-              cell.textContent = rowNumbers[i-1];
-            }
-            cell.style.backgroundColor = 'brown';
-            cell.style.border = '0px'
-          }else{
-            if((i+j)%2 == 0){
-              cell.style.backgroundColor = 'grey';
-            }else{
-              cell.style.backgroundColor = 'white';
-            }
-          }
+          cell.style.backgroundColor = 'white';
         }
         this.board.appendChild(cell);
       }
     }
+  }
+  validateMoveDiagonally(){
+    this.count = 0;
+    let place= [];
+      if(this.trow > this.frow && this.tcol > this.fcol){  //move down right
+        for(let i= this.frow+1, j = this.fcol+1; i<this.trow; i++, j++){
+          if (this.grid[i][j] !== ' ') {
+            this.count++;
+            place[0] = i;
+            place[1] = j;
+          }
+        }
+      }else if(this.trow > this.frow && this.tcol < this.fcol){ //move down left
+        for(let i= this.frow+1, j = this.fcol-1; i<this.trow; i++, j--){
+          if (this.grid[i][j] !== ' ') {
+            this.count++;
+            place[0] = i;
+            place[1] = j;
+          }
+        }
+      }else if(this.trow < this.frow && this.tcol > this.fcol){ //move up right
+        for(let i= this.frow-1, j = this.fcol+1; j<this.tcol; i--, j++){
+          if (this.grid[i][j] !== ' ') {
+            this.count++;
+            place[0] = i;
+            place[1] = j;
+          }
+        }
+      }else{
+        for(let i= this.trow+1, j = this.tcol+1; j<this.fcol; i++, j++){//move up left
+          if (this.grid[i][j] !== ' ') {
+            this.count++;
+            place[0] = i;
+            place[1] = j;
+          }
+        }
+      }
+      return place;
   }
 }
 //////////////////////////////////////////////////////////////////
