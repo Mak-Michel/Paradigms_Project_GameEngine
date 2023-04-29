@@ -281,7 +281,9 @@ class Chess extends engine {
                 piece = 9813;
               break;
               case 9814: //ٌRooks
+              if(Math.abs(this.trow - this.frow) == 0 || Math.abs(this.tcol - this.fcol) == 0){
                 clearPath = this.validateMove();
+              }
                 piece = 9814;
               break;
               case 9815: //bishops
@@ -363,7 +365,9 @@ class Chess extends engine {
                   piece = 9819;
                 break;
                 case 9820: //ٌRooks
-                  clearPath = this.validateMove();
+                  if(Math.abs(this.trow - this.frow) == 0 || Math.abs(this.tcol - this.fcol) == 0){
+                    clearPath = this.validateMove();
+                  }
                   piece = 9820;
                 break;
                 case 9821: //bishops
@@ -470,7 +474,7 @@ class Chess extends engine {
   }
   validateMove(){
     let clearPath = true;
-    if(this.trow - this.frow === 0) {   //move horiznotal
+    if(this.trow - this.frow == 0) {   //move horiznotal
       if(this.tcol > this.fcol){
         for(let j= this.fcol+1; j<this.tcol; j++){
           if (this.grid[this.trow][j] !== ' ') {
@@ -486,8 +490,7 @@ class Chess extends engine {
           }
         }
       }
-    }else if(this.tcol - this.fcol === 0) { // move vertical
-      let clearPath = true;
+    }else if(this.tcol - this.fcol == 0) { // move vertical
       if(this.trow > this.frow){  //move down
         for(let i= this.frow+1; i<this.trow; i++){
           if (this.grid[i][this.tcol] !== ' ') {
