@@ -177,7 +177,7 @@ class Connect4 extends engine {
 //chess
 class Chess extends engine {
   constructor() {
-    super(8, 8);        //inheritance
+    super(10, 10);        //inheritance
     var textElement = document.createElement('p');
     textElement.innerHTML = 'Initial position: &#9;&#9;&#9;Final Position:';
     textElement.style.whiteSpace = 'pre'; // Preserve whitespace characters
@@ -200,10 +200,10 @@ class Chess extends engine {
     this.tcol = null;
     this.form.addEventListener('submit', (event) => {
         event.preventDefault();
-        this.frow = this.input.value.charCodeAt(0)- 49;
-        this.fcol = this.input.value.charCodeAt(1)- 97;
-        this.trow = this.toInput.value.charCodeAt(0)- 49;
-        this.tcol = this.toInput.value.charCodeAt(1)- 97;
+        this.frow = this.input.value.charCodeAt(0)- 48;
+        this.fcol = this.input.value.charCodeAt(1)- 96;
+        this.trow = this.toInput.value.charCodeAt(0)- 48;
+        this.tcol = this.toInput.value.charCodeAt(1)- 96;
         this.controller();
       });
   
@@ -217,8 +217,10 @@ class Chess extends engine {
       const col = parseInt(cells[i].dataset.col);
       if (this.grid[row][col] == ' ') {
         cells[i].textContent = this.grid[row][col];
-      } else {
+      } else if(this.grid[row][col] > 900){
         cells[i].textContent = String.fromCharCode(this.grid[row][col]);
+      }else{
+        cells[i].textContent = this.grid[row][col];
       }
     }
   }
@@ -226,17 +228,17 @@ class Chess extends engine {
     let clearPath = false, piece = 0;
     if (this.grid[this.frow][this.fcol] == ' ') {
       alert('Invalid place1');
+    }else if (this.trow < 1 || this.trow > 8 || this.tcol < 1 || this.tcol > 8){
+      alert('Invalid place2');
+      return;
     }else{
       if(this.turn == 1){ //white turn
-        if(this.grid[this.trow][this.tcol] == 9813 || this.grid[this.trow][this.tcol] == 9814 ||
-          this.grid[this.trow][this.tcol] == 9815 || this.grid[this.trow][this.tcol] == 9816 ||
-          this.grid[this.trow][this.tcol] == 9817 || this.grid[this.trow][this.tcol] == 9812){
+        if(this.grid[this.trow][this.tcol] >= 9812 && this.grid[this.trow][this.tcol] <= 9817 ){
            alert('Invalid move');
            return;
          }
-        if(this.grid[this.frow][this.fcol] < 9812 || this.grid[this.frow][this.fcol] > 9817 ||
-           this.trow < 0 || this.trow > 7 || this.tcol < 0 || this.tcol > 7){
-            alert('Invalid place2');
+        if(this.grid[this.frow][this.fcol] < 9812 || this.grid[this.frow][this.fcol] > 9817){
+            alert('Not a white piece');
             return;
         }else{
           switch(this.grid[this.frow][this.fcol]){
@@ -253,7 +255,7 @@ class Chess extends engine {
                   }
                 }else if(this.trow == this.frow-2 && this.fcol == this.tcol){
                   if(this.grid[this.trow][this.tcol] == ' ' && this.grid[this.frow-1][this.fcol] == ' '){
-                    if(this.frow == 6){
+                    if(this.frow == 7){
                       clearPath = true;
                     }
                   }
@@ -312,15 +314,12 @@ class Chess extends engine {
           }
           this.drawer();
         }else{ //black turn
-          if(this.grid[this.trow][this.tcol] == 9818 || this.grid[this.trow][this.tcol] == 9819 ||
-            this.grid[this.trow][this.tcol] == 9820 || this.grid[this.trow][this.tcol] == 9821 ||
-            this.grid[this.trow][this.tcol] == 9822 || this.grid[this.trow][this.tcol] == 9823){
+          if(this.grid[this.trow][this.tcol] >= 9818 && this.grid[this.trow][this.tcol] <= 9823){
              alert('Invalid move');
              return;
            }
-          if(this.grid[this.frow][this.fcol] < 9818 || this.grid[this.frow][this.fcol] > 9823 ||
-             this.trow < 0 || this.trow > 7 || this.tcol < 0 || this.tcol > 7){
-              alert('Invalid place2');
+          if(this.grid[this.frow][this.fcol] < 9818 || this.grid[this.frow][this.fcol] > 9823 ){
+              alert('Not a black piece');
               return;
           }else{
             switch(this.grid[this.frow][this.fcol]){
@@ -337,7 +336,7 @@ class Chess extends engine {
                     }
                   }else if(this.trow == this.frow+2 && this.fcol == this.tcol){
                     if(this.grid[this.trow][this.tcol] == ' ' && this.grid[this.frow+1][this.fcol] == ' '){
-                      if(this.frow == 1){
+                      if(this.frow == 2){
                         clearPath = true;
                       }
                     }
@@ -398,9 +397,11 @@ class Chess extends engine {
         }
         
       }
-    }
+  }
 
   init(){
+    var rowNumbers = [1,2,3,4,5,6,7,8];
+    var colLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         const cell = document.createElement('div');
@@ -409,64 +410,82 @@ class Chess extends engine {
         cell.dataset.col = j;
         cell.style.width = '62px';
         cell.style.height = '62px';
-        //black
-        if(i == 1){//pawn
-          cell.textContent = String.fromCharCode(9823);
-          this.grid[i][j] = 9823;
-        }
-        if(i == 0 ){
-          if(j == 0 || j ==7){ //Rooks
-            cell.textContent = String.fromCharCode(9820);
-            this.grid[i][j] = 9820;
+        if(i == 0 || i == 9){
+          if(j > 0){
+            cell.textContent = colLetters[j-1];
+            this.grid[i][j] = colLetters[j-1];
           }
-          if(j == 1 || j==6){  //Knights
-            cell.textContent = String.fromCharCode(9822);
-            this.grid[i][j] = 9822;
-          }
-          if(j == 2 || j==5){  //Bishops
-            cell.textContent = String.fromCharCode(9821);
-            this.grid[i][j] = 9821;
-          }
-          if(j == 3){  //Queen
-            cell.textContent = String.fromCharCode(9819);
-            this.grid[i][j] = 9819;
-          }
-          if(j == 4){  //King
-            cell.textContent = String.fromCharCode(9818);
-            this.grid[i][j] = 9818;
-          }
-        }
-        //white
-        if(i == 6){
-          cell.textContent = String.fromCharCode(9817);
-          this.grid[i][j] = 9817;
-        }
-        if(i == 7 ){
-          if(j == 0 || j ==7){ //Rooks
-            cell.textContent = String.fromCharCode(9814);
-            this.grid[i][j] = 9814;
-          }
-          if(j == 1 || j==6){  //Knights
-            cell.textContent = String.fromCharCode(9816);
-            this.grid[i][j] = 9816;
-          }
-          if(j == 2 || j==5){  //Bishops
-            cell.textContent = String.fromCharCode(9815);
-            this.grid[i][j] = 9815;
-          }
-          if(j == 3){  //Queen
-            cell.textContent = String.fromCharCode(9813);
-            this.grid[i][j] = 9813;
-          }
-          if(j == 4){ //King
-            cell.textContent = String.fromCharCode(9812);
-            this.grid[i][j] = 9812;
-          }  
-        }
-        if((i+j)%2 == 0){
-          cell.style.backgroundColor = 'grey';
+          cell.style.backgroundColor = 'brown';
+          cell.style.border = '0px'
         }else{
-          cell.style.backgroundColor = 'white';
+          if(j == 0 || j== 9){
+            if(i > 0){
+              cell.textContent = rowNumbers[i-1];
+              this.grid[i][j] = rowNumbers[i-1];
+            }
+            cell.style.backgroundColor = 'brown';
+            cell.style.border = '0px'
+          }else{
+          //black
+            if(i == 2){//pawn
+              cell.textContent = String.fromCharCode(9823);
+              this.grid[i][j] = 9823;
+            }
+            if(i == 1 ){
+              if(j == 1 || j ==8){ //Rooks
+                cell.textContent = String.fromCharCode(9820);
+                this.grid[i][j] = 9820;
+              }
+              if(j == 2 || j==7){  //Knights
+                cell.textContent = String.fromCharCode(9822);
+                this.grid[i][j] = 9822;
+              }
+              if(j == 3 || j==6){  //Bishops
+                cell.textContent = String.fromCharCode(9821);
+                this.grid[i][j] = 9821;
+              }
+              if(j == 4){  //Queen
+                cell.textContent = String.fromCharCode(9819);
+                this.grid[i][j] = 9819;
+              }
+              if(j == 5){  //King
+                cell.textContent = String.fromCharCode(9818);
+                this.grid[i][j] = 9818;
+              }
+            }
+            //white
+            if(i == 7){
+              cell.textContent = String.fromCharCode(9817);
+              this.grid[i][j] = 9817;
+            }
+            if(i == 8 ){
+              if(j == 1 || j ==8){ //Rooks
+                cell.textContent = String.fromCharCode(9814);
+                this.grid[i][j] = 9814;
+              }
+              if(j == 2 || j==7){  //Knights
+                cell.textContent = String.fromCharCode(9816);
+                this.grid[i][j] = 9816;
+              }
+              if(j == 3 || j==4){  //Bishops
+                cell.textContent = String.fromCharCode(9815);
+                this.grid[i][j] = 9815;
+              }
+              if(j == 4){  //Queen
+                cell.textContent = String.fromCharCode(9813);
+                this.grid[i][j] = 9813;
+              }
+              if(j == 5){ //King
+                cell.textContent = String.fromCharCode(9812);
+                this.grid[i][j] = 9812;
+              }  
+            }
+            if((i+j)%2 == 1){
+              cell.style.backgroundColor = 'grey';
+            }else{
+              cell.style.backgroundColor = 'white';
+            }
+          }
         }
         this.board.appendChild(cell);
       }
@@ -636,7 +655,7 @@ class EightQueens extends engine {
 //Checkers
 class Checkers extends engine {
   constructor() {
-    super(8, 8);        //inheritance
+    super(10, 10);        //inheritance
     var textElement = document.createElement('p');
     textElement.innerHTML = 'Initial position: &#9;&#9;&#9;Final Position:';
     textElement.style.whiteSpace = 'pre'; // Preserve whitespace characters
@@ -659,10 +678,10 @@ class Checkers extends engine {
     this.tcol = null;
     this.form.addEventListener('submit', (event) => {
         event.preventDefault();
-        this.frow = this.input.value.charCodeAt(0)- 49;
-        this.fcol = this.input.value.charCodeAt(1)- 97;
-        this.trow = this.toInput.value.charCodeAt(0)- 49;
-        this.tcol = this.toInput.value.charCodeAt(1)- 97;
+        this.frow = this.input.value.charCodeAt(0)- 48;
+        this.fcol = this.input.value.charCodeAt(1)- 96;
+        this.trow = this.toInput.value.charCodeAt(0)- 48;
+        this.tcol = this.toInput.value.charCodeAt(1)- 96;
         this.controller();
       });
   
@@ -699,7 +718,7 @@ class Checkers extends engine {
       alert("Invalid move");
       return;
     }else if(this.grid[this.frow][this.fcol] < 1 || this.grid[this.frow][this.fcol] > 4 ||
-      this.trow < 0 || this.trow > 7 || this.tcol < 0 || this.tcol > 7){
+      this.trow < 1 || this.trow > 8 || this.tcol < 1 || this.tcol > 8){
        alert('Invalid place2');
        return;
     }else{
@@ -750,7 +769,7 @@ class Checkers extends engine {
         if(play){
           this.grid[this.trow][this.tcol] = piece;
           this.grid[this.frow][this.fcol] = ' ';
-          if(this.trow == 0){
+          if(this.trow == 1){
             this.grid[this.trow][this.tcol] = 3;
           }
           this.turn = 2;
@@ -806,7 +825,7 @@ class Checkers extends engine {
         if(play){
           this.grid[this.trow][this.tcol] = piece;
           this.grid[this.frow][this.fcol] = ' ';
-          if(this.trow == 7){
+          if(this.trow == 8){
             this.grid[this.trow][this.tcol] = 4;
           }
           this.turn = 1;
@@ -819,6 +838,8 @@ class Checkers extends engine {
     }
   }
   init(){
+    var rowNumbers = [1,2,3,4,5,6,7,8];
+    var colLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const white1 = 'white1.png';
     const black1 = 'black1.png';
     const cellSize = '62px';
@@ -830,30 +851,48 @@ class Checkers extends engine {
         cell.dataset.col = j;
         cell.style.width = cellSize;
         cell.style.height = cellSize;
-        //black
-        if((i == 0 || i == 2) && (j%2 == 1)){
-          cell.innerHTML = `<img src="${black1}" alt="My Image" style="width: 100%; height: 100%;">`;
-          this.grid[i][j] = 2;
-        }
-        if(i == 1 && j%2 == 0){
-          cell.innerHTML = `<img src="${black1}" alt="My Image" style="width: 100%; height: 100%;">`;
-          this.grid[i][j] = 2;
-        }
-        //white
-        if((i == 6) && (j%2 == 1)){
-          cell.innerHTML = `<img src="${white1}" alt="My Image" style="width: 100%; height: 100%;">`;
-          this.grid[i][j] = 1;
-        }
-        if((i == 5 || i == 7) && j%2 == 0){
-          cell.innerHTML = `<img src="${white1}" alt="My Image" style="width: 100%; height: 100%;">`;
-          this.grid[i][j] = 1;
-        }
-        if((i+j)%2 == 0){
-          cell.style.backgroundColor = 'grey';
+        if(i == 0 || i == 9){
+          if(j > 0){
+            cell.textContent = colLetters[j-1];
+            this.grid[i][j] = colLetters[j-1];
+          }
+          cell.style.backgroundColor = 'brown';
+          cell.style.border = '0px'
         }else{
-          cell.style.backgroundColor = 'white';
-        }
-        this.board.appendChild(cell);
+          if(j == 0 || j== 9){
+            if(i > 0){
+              cell.textContent = rowNumbers[i-1];
+              this.grid[i][j] = rowNumbers[j-1];
+            }
+            cell.style.backgroundColor = 'brown';
+            cell.style.border = '0px'
+          }else{
+            //black
+            if((i == 1 || i == 3) && (j%2 == 0)){
+              cell.innerHTML = `<img src="${black1}" alt="My Image" style="width: 100%; height: 100%;">`;
+              this.grid[i][j] = 2;
+            }
+            if(i == 2 && j%2 == 1){
+              cell.innerHTML = `<img src="${black1}" alt="My Image" style="width: 100%; height: 100%;">`;
+              this.grid[i][j] = 2;
+            }
+            //white
+            if((i == 7) && (j%2 == 0)){
+              cell.innerHTML = `<img src="${white1}" alt="My Image" style="width: 100%; height: 100%;">`;
+              this.grid[i][j] = 1;
+            }
+            if((i == 6 || i == 8) && j%2 == 1){
+              cell.innerHTML = `<img src="${white1}" alt="My Image" style="width: 100%; height: 100%;">`;
+              this.grid[i][j] = 1;
+            }
+            if((i+j)%2 == 1){
+              cell.style.backgroundColor = 'grey';
+            }else{
+              cell.style.backgroundColor = 'white';
+            }
+          }
+       }
+       this.board.appendChild(cell);
       }
     }
   }
