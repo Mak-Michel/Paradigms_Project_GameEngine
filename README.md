@@ -1,4 +1,4 @@
-# Paradigm-Project-JavaScript
+# Paradigms-Project
 ## A Game Engine implemented using 2 programming paradigms:
 1) OOP - using JavaScript
 2) Functional - using Scala
