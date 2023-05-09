@@ -3,13 +3,6 @@ body {
     background-color: #f2f2f2;
     font-family: Arial, sans-serif;
 } 
-.background{
-    top:50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    position: fixed;
-    z-index: -1;
-}
 video {
     position: fixed;
     top: 25%;
@@ -87,4 +80,11 @@ h1 {
     right: 170px;
     width: 100px;
     height: 40px;
+}
+.background{
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    z-index: -1;
 }
